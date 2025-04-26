@@ -1,0 +1,32 @@
+{
+  "usuarios": [
+    {
+      "id": "1",
+      "nome": "Nadla",
+      "cpf": "18729865418",
+      "email": "Nadla@gmail.com",
+      "senha": "12345"
+    },
+    {
+      "id": "2",
+      "nome": "Idinaldo",
+      "cpf": "82762516477",
+      "email": "Idinaldo@gmail.com",
+      "senha": "tralala"
+    }
+  ],
+  "contatos": [
+    {
+      "id": "1",
+      "num": "(81)90000-0000",
+      "nome": "Nadla Gabi",
+      "email": "nadla@gmail.com"
+    }, 
+    {
+      "id": "2",
+      "num": "(81)91111-1111",
+      "nome": "Idinaldo",
+      "email": "Idinaldo@gmail.com"
+    }
+  ]
+}

@@ -1,11 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button, Alert} from 'react-native';
-import { Avatar, Header } from 'react-native-elements';
+import { StatusBar} from 'expo-status-bar';
+import { StyleSheet, Text, View, TextInput, Button} from 'react-native';
+import { Avatar, onPress} from 'react-native-elements';
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ScreenStackHeaderCenterView } from 'react-native-screens';
-import { SafeAreaView } from 'react-native-web';
+import React, { useState } from 'react';
+import axios from 'axios';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,8 +50,22 @@ function Pag1({navigation}) {
 }
 
 
-function Contatospg({navigation}) {
-  contatos = [[['Nadla Gabriele'], ['81 91982-1982']], [["Idinaldo Rocha"],['81 98128-2692']], [['Naddo Gacha'], ['81 96292-2875']]]
+function Contatospg({navigation, route}) {
+  const [contatos, setContatos] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    axios.get('http://localhost:3000/contatos')
+      .then((response) => {
+        setContatos(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar contatos:', error);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <View style={styles.container}>
       
@@ -62,70 +77,53 @@ function Contatospg({navigation}) {
           icon={{ name: 'user', type: 'font-awesome'}}
           containerStyle={{ backgroundColor: '#e499e4' }}
       /> 
-      <Text style={styles.texto}>{contatos[0][0]} - {contatos[0][1]} </Text>
-      <Button
-          color="#e499e4"
-          title="Modificar"
-          onPress={()=>navigation.navigate('Modificar')}
-      /><br></br>
-      <Avatar
-          size={40}
-          rounded
-          icon={{ name: 'user', type: 'font-awesome'}}
-          containerStyle={{ backgroundColor: '#e499e4' }}
-      /> 
-      <Text style={styles.texto}>{contatos[1][0]} - {contatos[1][1]}</Text>
-      <Button
-          color="#e499e4"
-          title="Modificar"
-          onPress={()=>navigation.navigate('Modificar')}
-      /><br></br>
-      <Avatar
-          size={40}
-          rounded
-          icon={{ name: 'user', type: 'font-awesome'}}
-          containerStyle={{ backgroundColor: '#e499e4' }}
-      /> 
-      <Text style={styles.texto}>{contatos[2][0]} - {contatos[2][1]}</Text>
-      <Button
-          color="#e499e4"
-          title="Modificar"
-          onPress={()=>navigation.navigate('Modificar')}
-      />
-      <br></br>
-      <Button
-        color="#e499e4"
-        title="Adicionar"
-        onPress={()=>navigation.navigate('Adicionar')}
-      />
+    <View> {
+      contatos.map((item, i) => (
+          <ListItem key={i} bottomDivider>
+            <ListItem.Content>
+              <ListItem.Title>{item.nome}</ListItem.Title>
+              <ListItem.Title>{item.email}</ListItem.Title>
+              <ListItem.Title>{item.cpf}</ListItem.Title>
+              <ListItem.Title>{item.num}</ListItem.Title>
+              <ListItem.Title><Button style={styles.Button} title="Editar" onPress={() => navigation.navigate('Modificarpg', {contatos: item})}/></ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+      ))
+      }   
+    </View>
       </View>
     );
   }  
 
  function Cadastropg({navigation}) {
+  const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+
+  const saveUser = () => {
+    axios.post('http://localhost:3000/usuarios', {
+      nome, cpf, senha
+    })
+    .then(() => navigation.navigate('Login'))
+    .catch((err) => console.log(err));
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.texto}>Nome:</Text>
-      <TextInput
-          style={styles.input}
-          placeholder= "Ex: Nadla Rocha"/>
+     <Input style={styles.Input} placeholder='Ex: idinaldo' value={nome} onChangeText={setNome}/>
       <Text style={styles.texto}>CPF:</Text>
-      <TextInput
-          style={styles.input}
-          placeholder= "000.000.000-00"/>
+      <Input style={styles.Input} placeholder='000.000.000-00' value={cpf} onChangeText={setCpf}/>
       <Text style={styles.texto}>Email:</Text>
-      <TextInput
-          style={styles.input}
-          placeholder= "xxx@mail.com"/>
+      <Input style={styles.Input} placeholder='xxx@mail.com' value={email} onChangeText={setEmail}/>
       <Text style={styles.texto}>Senha:</Text>
-      <TextInput
-          style={styles.input}
-          placeholder= "#####" />
+      <Input style={styles.Input} placeholder="#####" value={senha} onChangeText={setSenha} secureTextEntry={true}/>
         <br></br>
       <Button
         color="#e499e4"
         title="salvar"
-        onPress={() => alert.alert("salvando cadastro")}
+        onPress={navigation.navigate('Contatospg', {contatos: item})}
        />
 
       <StatusBar style="auto" />
@@ -134,25 +132,32 @@ function Contatospg({navigation}) {
 }
 
 function Adicionarpg({navigation}) {
+  const [num, setNum] = useState('');
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+
+  const salvarCont = () => {
+    axios.post('http://localhost:3000/contatos', {
+      num, nome, email
+    })
+    .then(() => navigation.navigate('Contatospg'))
+    .catch((err) => console.log(err));
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.texto}>Nome:</Text>
-      <TextInput
-          style={styles.input}
-          placeholder= "Ex: Nadla Rocha"/>
+      <Input style={styles.Input} placeholder='Nadla Rocha' value={nome} onChangeText={setNome}/>
       <Text style={styles.texto}>Email:</Text>
-      <TextInput
-          style={styles.input}
-          placeholder= "xxx@mail.com"/>
+      <Input style={styles.Input} placeholder='xxx@mail.com' value={email} onChangeText={setEmail}/>
       <Text style={styles.texto}>Telefone:</Text>
-      <TextInput
-          style={styles.input}
-          placeholder= "(81) 90000-0000" />
+      <Input style={styles.Input} placeholder='(81) 90000-0000' value={num} onChangeText={setNum}/>
+  
         <br></br>
       <Button
         color="#e499e4"
         title="salvar"
-        onPress={() => alert.alert("salvando contato")}
+        onPress={{salvarCont}}
        />
 
       <StatusBar style="auto" />
@@ -161,30 +166,51 @@ function Adicionarpg({navigation}) {
 }
 
 function Modificarpg({navigation}) {
+  const { contatos } = route.params;
+  const [num, setNum] = useState(contatos.num);
+  const [nome, setNome] = useState(contatos.nome);
+  const [email, setEmail] = useState(contatos.email);
+
+  const deletarContato = (id) => {
+    axios.delete(`http://localhost:3000/contatos/${contatos.id}`)
+    .then((response) => {
+      setContatos(response.data);
+      setLoading(false);
+    } , navigation.navigate('Home'))
+    .catch((error) => {
+      console.error('Erro ao buscar contatos:', error);
+      setLoading(false);
+    });
+  }
+
+  const addContato = () => {
+    axios.put(`http://localhost:3000/contatos/${contatos.id}`, {
+      ...contatos,
+      nome,
+      num,
+      email
+    })
+    .then(() => navigation.navigate('Home'))
+    .catch((err) => console.log(err));
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.texto}>Nome:</Text>
-      <TextInput
-          style={styles.input}
-          placeholder= "Ex: Nadla Rocha"/>
+      <Input style={styles.Input} placeholder='Ex:> idinaldo' value={nome} onChangeText={setNome}/>
       <Text style={styles.texto}>Email:</Text>
-      <TextInput
-          style={styles.input}
-          placeholder= "xxx@mail.com"/>
+      <Input style={styles.Input} placeholder='xxx@mail'value={email} onChangeText={setEmail}/>
       <Text style={styles.texto}>Telefone:</Text>
-      <TextInput
-          style={styles.input}
-          placeholder= "(81) 90000-0000" />
+      <Input style={styles.Input} placeholder='(81) 90000-0000' value={num} onChangeText={setNum}/>
         <br></br>
       <Button
         color="#e499e4"
         title="alterar"
-        onPress={() => alert.alert("alterando contato")}
+        onPress={addContato}
        /><br></br>
        <Button
         color="#e499e4"
         title="excluir"
-        onPress={() => alert.alert("excluindo contato")}
+        onPress={deletarContato}
        />
 
       <StatusBar style="auto" />
